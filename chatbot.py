@@ -133,7 +133,7 @@ async def rebuild_vectorstore_handler():
     await rebuild_vectorstore()
     return jsonify({"message": "Vector store rebuilt"}), 200
 
-@client.on(events.NewMessage(pattern='^\\.x (.+)'))
+@client.on(events.NewMessage(pattern=r'^\.x (.+)', func=lambda e: e.text.lower().startswith('.x ')))
 async def answer_query(event):
     query = event.pattern_match.group(1)
     logging.info(f"Received query: {query}")
