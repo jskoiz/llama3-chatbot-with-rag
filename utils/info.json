@@ -1,0 +1,453 @@
+{
+    "type": "list",
+    "pages": {
+        "type": "pages",
+        "next": "https://api.intercom.io/articles?per_page=25&page=2",
+        "page": 1,
+        "per_page": 25,
+        "total_pages": 9
+    },
+    "total_count": 202,
+    "data": [
+        {
+            "id": "9307893",
+            "type": "article",
+            "workspace_id": "jr583c8b",
+            "parent_id": null,
+            "parent_type": null,
+            "parent_ids": [],
+            "title": "Simple Settings - SB/SS",
+            "description": "",
+            "body": "<p class=\"no-margin\">Walk through Simple Buy and Simple Sell guides, how to switch mode and simply execute transactions!</p>\n<p class=\"no-margin\"></p>\n<p class=\"no-margin\">Simple Buy: </p>\n<div class=\"intercom-h2b-video\"><iframe src=\"https://www.youtube.com/embed/paAXQ5539uE?rel=0\" frameborder=\"0\" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe></div><p class=\"no-margin\">Simple Sell: </p>\n<div class=\"intercom-h2b-video\"><iframe src=\"https://www.youtube.com/embed/D-SLv93kyKg?rel=0\" frameborder=\"0\" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe></div>",
+            "author_id": 7303886,
+            "state": "published",
+            "created_at": 1715284936,
+            "updated_at": 1715285433,
+            "url": "https://intercom.help/trojan-support/en/articles/9307893-simple-settings-sb-ss"
+        },
+        {
+            "id": "9289341",
+            "type": "article",
+            "workspace_id": "jr583c8b",
+            "parent_id": null,
+            "parent_type": null,
+            "parent_ids": [],
+            "title": "DONT ANSWER DMS",
+            "description": "Mods never DM or message first",
+            "body": "<p class=\"no-margin\">\ud83d\udea8WARNING!\ud83d\udea8\u26a0\ufe0f Watch out for scammers posing as administrators. \u26a0\ufe0f - **Admins never initiate DMs and never request private keys or money. ** - **AVOID OPENING ANY LINKS THEY SEND. PRIORITIZE SAFETY. ALWAYS VERIFY!****We do NOT have an official support account and ONLY our Team or Community Mods can assist you!** - Use /adminlist to verify our team and mods @ and click through their @ to confirm who you are talking to.\u203c\ufe0fAlways use our official bot links using the /bots command here!\u203c\ufe0f</p>",
+            "author_id": 7303886,
+            "state": "draft",
+            "created_at": 1715021813,
+            "updated_at": 1715021813,
+            "url": null
+        },
+        {
+            "id": "9283382",
+            "type": "article",
+            "workspace_id": "jr583c8b",
+            "parent_id": null,
+            "parent_type": null,
+            "parent_ids": [],
+            "title": "When is the sniper been released",
+            "description": ".",
+            "body": "<p class=\"no-margin\">The Sniper is currently available to an exclusive audience only, but don't worry! The public launch is on the horizon.</p>",
+            "author_id": 7303886,
+            "state": "draft",
+            "created_at": 1714942607,
+            "updated_at": 1714942608,
+            "url": null
+        },
+        {
+            "id": "9283372",
+            "type": "article",
+            "workspace_id": "jr583c8b",
+            "parent_id": null,
+            "parent_type": null,
+            "parent_ids": [],
+            "title": "How do I buy?",
+            "description": ".",
+            "body": "<p class=\"no-margin\">How to Execute a Swap (Market Price) Order:Initiating a Purchase:Go to the main menu and click on 'Buy'. You'll be prompted to enter a ticker or Token Contract.Entering Token Details:Respond with the ticker or Token Contract for the asset you want to purchase.Performing the Swap:After entering the token information, click on \"Swap \u2705\".Choose from the default buy amounts or select \"X SOL \u270f\ufe0f\" to enter a custom amount.Opt for the default slippage setting or customize it by clicking \"X Slippage \u270f\ufe0f\".Completing the Transaction:Confirm all parameters and click \"BUY\".Once the transaction is complete, a \"Buy success\" message will appear, along with a link to Solscan.io for transaction details. You can also click \"View Tokens\" to manage your tokens in the Positions menu.</p>",
+            "author_id": 7303886,
+            "state": "draft",
+            "created_at": 1714941763,
+            "updated_at": 1714941763,
+            "url": null
+        },
+        {
+            "id": "9283327",
+            "type": "article",
+            "workspace_id": "jr583c8b",
+            "parent_id": null,
+            "parent_type": null,
+            "parent_ids": [],
+            "title": "How to Sell Tokens",
+            "description": "Sell your coins within the Trojan bot by swap or limit.",
+            "body": "<p class=\"no-margin\">you can sell your coins within the Telegram interface by:1. Funding your wallet with SOL. 2. Entering a contract address, ticker, or a DEX web link into the chat. 3. Sending the message.Additionally, you can also view your current token positions and sell specific parts of your holdings or liquidate them completely from within the same messenger.</p>",
+            "author_id": 7303886,
+            "state": "draft",
+            "created_at": 1714937948,
+            "updated_at": 1714937948,
+            "url": null
+        },
+        {
+            "id": "9227451",
+            "type": "article",
+            "workspace_id": "jr583c8b",
+            "parent_id": 9236540,
+            "parent_type": "collection",
+            "parent_ids": [
+                9236540
+            ],
+            "title": "Pump.Fun Tokens",
+            "description": "",
+            "body": "<p class=\"no-margin\">Trojan on Solana directly supports Pump.fun tokens and you can trade them on the bonding curve!</p>\n<ol>\n<li>\n<p class=\"no-margin\">Send a Pump.fun link or Contract Address to bot.</p>\n</li>\n<li>\n<p class=\"no-margin\">You\u2019ll see the live Market Cap and be able to trade on the bonding curve and continue once live. Auto Sell and Limit Orders are working too!</p>\n</li>\n</ol><p class=\"no-margin\"></p>\n<p class=\"no-margin\">Once the token goes live on Raydium liquidity will be exact.</p>\n<p class=\"no-margin\"></p>\n<p class=\"no-margin\"><b>Note:</b> You can access Pump.fun chart ONLY from Buy and Sell menu's!</p>\n<p class=\"no-margin\">All others will take you to Dexscreener.com, once the token is live on Raydium all chart links will be Dexscreener.</p>",
+            "author_id": 7303886,
+            "state": "published",
+            "created_at": 1713701906,
+            "updated_at": 1714855834,
+            "url": "https://intercom.help/trojan-support/en/articles/9227451-pump-fun-tokens"
+        },
+        {
+            "id": "9227450",
+            "type": "article",
+            "workspace_id": "jr583c8b",
+            "parent_id": 9236539,
+            "parent_type": "collection",
+            "parent_ids": [
+                9236539
+            ],
+            "title": "Pump.Fun Tokens",
+            "description": "",
+            "body": "<p class=\"no-margin\">Trojan on Solana directly supports Pump.fun tokens and you can trade them on the bonding curve!</p>\n<ol>\n<li>\n<p class=\"no-margin\">Send a Pump.fun link or Contract Address to bot.</p>\n</li>\n<li>\n<p class=\"no-margin\">You\u2019ll see the live Market Cap and be able to trade on the bonding curve and continue once live. Auto Sell and Limit Orders are working too!</p>\n</li>\n</ol><p class=\"no-margin\"></p>\n<p class=\"no-margin\">Once the token goes live on Raydium liquidity will be exact.</p>\n<p class=\"no-margin\"></p>\n<p class=\"no-margin\"><b>Note:</b> You can access Pump.fun chart ONLY from Buy and Sell menu's!</p>\n<p class=\"no-margin\">All others will take you to Dexscreener.com, once the token is live on Raydium all chart links will be Dexscreener.</p>",
+            "author_id": 7303886,
+            "state": "published",
+            "created_at": 1713701865,
+            "updated_at": 1714855818,
+            "url": "https://intercom.help/trojan-support/en/articles/9227450-pump-fun-tokens"
+        },
+        {
+            "id": "9221712",
+            "type": "article",
+            "workspace_id": "jr583c8b",
+            "parent_id": 9236538,
+            "parent_type": "collection",
+            "parent_ids": [
+                9236538
+            ],
+            "title": "Exploring the Trojan Telegram Bot: A Gateway to Crypto Trading on Telegram",
+            "description": "",
+            "body": "<p class=\"no-margin\"><b>Overview of Trojan on Telegram for Crypto Trading:</b></p>\n<p class=\"no-margin\"></p>\n<p class=\"no-margin\"><b>Platform:</b> Trojan leverages the popular messaging app, Telegram, to facilitate cryptocurrency trading directly through chat.</p>\n<p class=\"no-margin\"></p>\n<p class=\"no-margin\"><b>Functionality:</b> Users can buy and sell tokens with ease within the Telegram interface. Transactions are initiated simply by funding your wallet with SOL, entering a contract address, ticker, or a DEX web link into the chat, and then sending the message.</p>\n<p class=\"no-margin\"></p>\n<p class=\"no-margin\"><b>Ease of Use:</b> The trading process is designed for convenience, allowing you to specify the amount of SOL to use for purchases with just a few clicks.</p>\n<p class=\"no-margin\"></p>\n<p class=\"no-margin\"><b>Portfolio Management:</b> Within the same messenger, you can view your current token positions, sell specific parts of your holdings, or liquidate them completely.</p>",
+            "author_id": 7280196,
+            "state": "published",
+            "created_at": 1713544123,
+            "updated_at": 1714475691,
+            "url": "https://intercom.help/trojan-support/en/articles/9221712-exploring-the-trojan-telegram-bot-a-gateway-to-crypto-trading-on-telegram"
+        },
+        {
+            "id": "9219920",
+            "type": "article",
+            "workspace_id": "jr583c8b",
+            "parent_id": 9258003,
+            "parent_type": "collection",
+            "parent_ids": [
+                9258003
+            ],
+            "title": "Introducing our Telegram Bot",
+            "description": "",
+            "body": "",
+            "author_id": 7280196,
+            "state": "published",
+            "created_at": 1713512236,
+            "updated_at": 1713512260,
+            "url": "https://intercom.help/trojan-support/en/articles/9219920-introducing-our-telegram-bot"
+        },
+        {
+            "id": "9219918",
+            "type": "article",
+            "workspace_id": "jr583c8b",
+            "parent_id": 9258003,
+            "parent_type": "collection",
+            "parent_ids": [
+                9258003
+            ],
+            "title": "Navigating Solana DeFi",
+            "description": "",
+            "body": "",
+            "author_id": 7280196,
+            "state": "published",
+            "created_at": 1713512220,
+            "updated_at": 1713512226,
+            "url": "https://intercom.help/trojan-support/en/articles/9219918-navigating-solana-defi"
+        },
+        {
+            "id": "9219844",
+            "type": "article",
+            "workspace_id": "jr583c8b",
+            "parent_id": 9258003,
+            "parent_type": "collection",
+            "parent_ids": [
+                9258003
+            ],
+            "title": "TokenScan",
+            "description": "",
+            "body": "",
+            "author_id": 7280196,
+            "state": "published",
+            "created_at": 1713511094,
+            "updated_at": 1713511104,
+            "url": "https://intercom.help/trojan-support/en/articles/9219844-tokenscan"
+        },
+        {
+            "id": "9218250",
+            "type": "article",
+            "workspace_id": "jr583c8b",
+            "parent_id": 9236554,
+            "parent_type": "collection",
+            "parent_ids": [
+                9236554
+            ],
+            "title": "How much it costs to bridge SOL > ETH?",
+            "description": "",
+            "body": "<p class=\"no-margin\">Depending on network congestion, the bridging fee may be higher or lower on different time frames. Bridging fee may be as low as 10$ and as high as 100$. </p>\n<p class=\"no-margin\"></p>\n<p class=\"no-margin\">Check bridge transaction fee on our providers website: <a href=\"https://swap.mayan.finance/\" target=\"_blank\" class=\"intercom-content-link\">https://swap.mayan.finance/</a>. </p>\n<p class=\"no-margin\"></p>",
+            "author_id": 7303886,
+            "state": "published",
+            "created_at": 1713476578,
+            "updated_at": 1714855978,
+            "url": "https://intercom.help/trojan-support/en/articles/9218250-how-much-it-costs-to-bridge-sol-eth"
+        },
+        {
+            "id": "9218249",
+            "type": "article",
+            "workspace_id": "jr583c8b",
+            "parent_id": 9236554,
+            "parent_type": "collection",
+            "parent_ids": [
+                9236554
+            ],
+            "title": "How much it costs to bridge ETH > SOL?",
+            "description": "",
+            "body": "<p class=\"no-margin\">Depending on network congestion, the bridging fee may be higher or lower on different time frames. Bridging fee may be as low as 10$ and as high as 100$. </p>\n<p class=\"no-margin\"></p>\n<p class=\"no-margin\">Check bridge transaction fee on our providers website: <a href=\"https://swap.mayan.finance/\" target=\"_blank\" class=\"intercom-content-link\">https://swap.mayan.finance/</a>. </p>",
+            "author_id": 7303886,
+            "state": "published",
+            "created_at": 1713476525,
+            "updated_at": 1714855921,
+            "url": "https://intercom.help/trojan-support/en/articles/9218249-how-much-it-costs-to-bridge-eth-sol"
+        },
+        {
+            "id": "9218239",
+            "type": "article",
+            "workspace_id": "jr583c8b",
+            "parent_id": 9236554,
+            "parent_type": "collection",
+            "parent_ids": [
+                9236554
+            ],
+            "title": "Where i can check status of my Bridge transaction?",
+            "description": "",
+            "body": "<p class=\"no-margin\">You can check status of your transaction on our providers website.</p>\n<p class=\"no-margin\"></p>\n<p class=\"no-margin\">Provider: <a href=\"https://explorer.mayan.finance/\" target=\"_blank\" class=\"intercom-content-link\">https://explorer.mayan.finance/</a>. </p>",
+            "author_id": 7303886,
+            "state": "published",
+            "created_at": 1713476265,
+            "updated_at": 1714855534,
+            "url": "https://intercom.help/trojan-support/en/articles/9218239-where-i-can-check-status-of-my-bridge-transaction"
+        },
+        {
+            "id": "9218231",
+            "type": "article",
+            "workspace_id": "jr583c8b",
+            "parent_id": 9236552,
+            "parent_type": "collection",
+            "parent_ids": [
+                9236552
+            ],
+            "title": "Which wallets i can use to import/export to?",
+            "description": "",
+            "body": "<p class=\"no-margin\">You can use any wallet web3/extension that supports Solana Network. Some of the known web3 wallets are Phantom, Solflare, Rabbit, Backpack and TrustWallet. You will need the private key of that wallet to be able to import/export it.</p>\n<p class=\"no-margin\"></p>\n<p class=\"no-margin\"><b>Accepted formats </b>are in the style of Phantom (e.g. \"88631DEyXSWf...\") or Solflare (e.g. [93,182,8,9,100,...]). Private keys from other Telegram bots should also work when importing to Trojan.</p>",
+            "author_id": 7303886,
+            "state": "published",
+            "created_at": 1713476038,
+            "updated_at": 1714856245,
+            "url": "https://intercom.help/trojan-support/en/articles/9218231-which-wallets-i-can-use-to-import-export-to"
+        },
+        {
+            "id": "9218230",
+            "type": "article",
+            "workspace_id": "jr583c8b",
+            "parent_id": 9236552,
+            "parent_type": "collection",
+            "parent_ids": [
+                9236552
+            ],
+            "title": "How to delete my current wallet?",
+            "description": "",
+            "body": "<p class=\"no-margin\">We don't have \"delete wallet\" button yet, however you can import any wallet to delete and replace your current one. Create new wallet in Phantom, Solflare, Backpack or other platform and import it to Trojan.</p>\n<p class=\"no-margin\"></p>\n<p class=\"no-margin\"><b>To Import:</b></p>\n<ol>\n<li>\n<p class=\"no-margin\">Go to main menu (type /start) and click on \"Settings\", then press \"Wallets\".</p>\n</li>\n<li>\n<p class=\"no-margin\">Click \"Import Solana Wallet\".</p>\n</li>\n<li>\n<p class=\"no-margin\">\u26a0\ufe0f <b>Important Note</b>: if you proceed, your existing Solana wallet will be replaced.</p>\n<p class=\"no-margin\">Make sure you have transferred your tokens off your existing wallet before you continue. We aren't responsible for losses due to user error.</p>\n<p class=\"no-margin\"></p>\n<p class=\"no-margin\"><b>Accepted formats </b>are in the style of Phantom (e.g. \"88631DEyXSWf...\") or Solflare (e.g. [93,182,8,9,100,...]). Private keys from other Telegram bots should also work.</p>\n<p class=\"no-margin\"></p>\n</li>\n<li>\n<p class=\"no-margin\">When you exported current wallets private keys or transferred out assets you can click \"Proceed with Import\".</p>\n</li>\n<li>\n<p class=\"no-margin\">Paste Private Keys of the wallet you want to import into Trojan.</p>\n</li>\n</ol>",
+            "author_id": 7303886,
+            "state": "published",
+            "created_at": 1713476011,
+            "updated_at": 1714855126,
+            "url": "https://intercom.help/trojan-support/en/articles/9218230-how-to-delete-my-current-wallet"
+        },
+        {
+            "id": "9218227",
+            "type": "article",
+            "workspace_id": "jr583c8b",
+            "parent_id": 9236552,
+            "parent_type": "collection",
+            "parent_ids": [
+                9236552
+            ],
+            "title": "MEV Protection Tip - Buys / Sells",
+            "description": "",
+            "body": "<p class=\"no-margin\">MEV Protection Tip or JITO tip is mandatory to leverage MEV Protection.</p>\n<p class=\"no-margin\">It ensures that your transaction will be private and can't be attacked by MEV bots.</p>\n<p class=\"no-margin\"></p>\n<p class=\"no-margin\">Go to main menu (type /start) and click on \"Settings\".</p>\n<p class=\"no-margin\">In Settings menu you can enable MEV Protect (Buys) and (Sells) separately, after its activated you can specify \"Tip\".</p>\n<p class=\"no-margin\"></p>\n<p class=\"no-margin\">- Minimum MEV Protection Tip is set to 0.003 SOL to ensure you can bid and compete with other traders to get priority in protected slot.</p>\n<p class=\"no-margin\"></p>\n<p class=\"no-margin\"><b>Note</b>: Approximately only 30% of Validators provide MEV Protected pvt tx (JITO Slots), which is why it can slow down your transaction speed.</p>\n<p class=\"no-margin\"></p>\n<p class=\"no-margin\">What is MEV:</p>\n<div class=\"intercom-container\"><img src=\"https://downloads.intercomcdn.com/i/o/1027862380/ec6133541dd0f97e4b4fa5b5/telegram-cloud-photo-size-4-5841179214055849779-y.jpg\"></div>",
+            "author_id": 7303886,
+            "state": "draft",
+            "created_at": 1713475927,
+            "updated_at": 1713707734,
+            "url": null
+        },
+        {
+            "id": "9218222",
+            "type": "article",
+            "workspace_id": "jr583c8b",
+            "parent_id": 9236552,
+            "parent_type": "collection",
+            "parent_ids": [
+                9236552
+            ],
+            "title": "What is MEV Protection / Anti-MEV?",
+            "description": "",
+            "body": "<p class=\"no-margin\">MEV Protection (JITO Slots) ensure that your transaction will be private and can't be attacked by MEV bots. By leveraging MEV Protection your transaction can't be detected in mempool to be frontrun.</p>\n<p class=\"no-margin\"></p>\n<p class=\"no-margin\"><b>How to activate MEV Protection:</b></p>\n<p class=\"no-margin\">Go to main menu (type /start) and click on \"Settings\".</p>\n<p class=\"no-margin\">In Settings menu you can enable MEV Protect (Buys) and (Sells) separately, after its activated you can specify \"Gas Tip\".</p>\n<p class=\"no-margin\"></p>\n<p class=\"no-margin\"><b>Note</b>: Approximately only 30% of Validators provide MEV Protected pvt tx (JITO Slots), which is why it can slow down your transaction speed.</p>",
+            "author_id": 7303886,
+            "state": "published",
+            "created_at": 1713475724,
+            "updated_at": 1714855268,
+            "url": "https://intercom.help/trojan-support/en/articles/9218222-what-is-mev-protection-anti-mev"
+        },
+        {
+            "id": "9218216",
+            "type": "article",
+            "workspace_id": "jr583c8b",
+            "parent_id": 9236552,
+            "parent_type": "collection",
+            "parent_ids": [
+                9236552
+            ],
+            "title": "What is MEV bot?",
+            "description": "",
+            "body": "<p class=\"no-margin\">MEV (Maximal Extractable Value) in cryptocurrency refers to the profit that someone can make by strategically ordering, including, or excluding transactions in a blockchain block. Essentially, it's about smartly manipulating transaction orders to earn extra money beyond the usual rewards for validating blockchain actions. MEV bots automate this process, finding and executing these profitable opportunities automatically.</p>\n<p class=\"no-margin\"></p>\n<p class=\"no-margin\">What is MEV:</p>\n<div class=\"intercom-container\"><img src=\"https://downloads.intercomcdn.com/i/o/1027864369/5cb9aa19e060e7c8b08dd3f2/telegram-cloud-photo-size-4-5841179214055849779-y.jpg\"></div><p class=\"no-margin\"></p>\n<p class=\"no-margin\">To be protected consider MEV Protection (JITO Slots), to ensure that your transaction will be private and can't be attacked by MEV bots.</p>\n<p class=\"no-margin\"></p>\n<p class=\"no-margin\"><b>How to activate MEV Protection:</b></p>\n<p class=\"no-margin\">Go to main menu (type /start) and click on \"Settings\".</p>\n<p class=\"no-margin\">In Settings menu you can enable MEV Protect (Buys) and (Sells) separately, after its activated you can specify \"Gas Tip\".</p>\n<p class=\"no-margin\"></p>\n<p class=\"no-margin\"><b>Note</b>: Approximately only 30% of Validators provide MEV Protected pvt tx (JITO Slots), which is why it can slow down your transaction speed.</p>",
+            "author_id": 7303886,
+            "state": "published",
+            "created_at": 1713475599,
+            "updated_at": 1714853748,
+            "url": "https://intercom.help/trojan-support/en/articles/9218216-what-is-mev-bot"
+        },
+        {
+            "id": "9218213",
+            "type": "article",
+            "workspace_id": "jr583c8b",
+            "parent_id": 9236552,
+            "parent_type": "collection",
+            "parent_ids": [
+                9236552
+            ],
+            "title": "Can i change interface language to Chinese?",
+            "description": "",
+            "body": "<p class=\"no-margin\">Go to main menu (type /start) and click \"Settings\", then press on \"2 flags\" button on top. This way you will switch interface language to Chinese or vice versa to English.</p>",
+            "author_id": 7303886,
+            "state": "published",
+            "created_at": 1713475492,
+            "updated_at": 1715429457,
+            "url": "https://intercom.help/trojan-support/en/articles/9218213-can-i-change-interface-language-to-chinese"
+        },
+        {
+            "id": "9218204",
+            "type": "article",
+            "workspace_id": "jr583c8b",
+            "parent_id": 9236552,
+            "parent_type": "collection",
+            "parent_ids": [
+                9236552
+            ],
+            "title": "Can i use custom RPC?",
+            "description": "",
+            "body": "<p class=\"no-margin\">You can't use Custom RPC. No plans to implement it.</p>",
+            "author_id": 7303886,
+            "state": "published",
+            "created_at": 1713475265,
+            "updated_at": 1714855156,
+            "url": "https://intercom.help/trojan-support/en/articles/9218204-can-i-use-custom-rpc"
+        },
+        {
+            "id": "9218202",
+            "type": "article",
+            "workspace_id": "jr583c8b",
+            "parent_id": 9236552,
+            "parent_type": "collection",
+            "parent_ids": [
+                9236552
+            ],
+            "title": "How to hide USD/SOL profit on PnL cards?",
+            "description": "",
+            "body": "<p class=\"no-margin\">PnL Values shows PnL (SOL / USD) profit on your PnL Cards after you completely sell position or request PnL Card.</p>\n<p class=\"no-margin\"></p>\n<p class=\"no-margin\">Go to main menu (type /start) and click on \"Settings\", then press on \"PnL Values\" to disable it and hide USD/SOL profits.</p>\n<p class=\"no-margin\">- \ud83d\udfe2 PnL Values: Enabled</p>\n<p class=\"no-margin\">- \ud83d\udd34 PnL Values: Disabled</p>\n<p class=\"no-margin\"></p>\n<p class=\"no-margin\">If you can't see PnL Values in settings menu, click on Advanced Mode to access all available features and settings.</p>",
+            "author_id": 7303886,
+            "state": "published",
+            "created_at": 1713475214,
+            "updated_at": 1714855580,
+            "url": "https://intercom.help/trojan-support/en/articles/9218202-how-to-hide-usd-sol-profit-on-pnl-cards"
+        },
+        {
+            "id": "9218183",
+            "type": "article",
+            "workspace_id": "jr583c8b",
+            "parent_id": 9236552,
+            "parent_type": "collection",
+            "parent_ids": [
+                9236552
+            ],
+            "title": "What is recommended slippage?",
+            "description": "",
+            "body": "<p class=\"no-margin\">There is no recommended slippage.  </p>\n<p class=\"no-margin\"></p>\n<p class=\"no-margin\">Before making a transaction, make sure you are aware of Price Impact and tokens volatility before taking a trade.</p>\n<p class=\"no-margin\"></p>\n<p class=\"no-margin\">- If your token's price is more stable and not as volatile, please use tighter slippage i.e. 5% or lower. </p>\n<p class=\"no-margin\">- If the price volatility is high and the price jumps up and down in seconds, consider all risks and use higher slippage settings. Our default slippage is 15%.</p>\n<p class=\"no-margin\"></p>\n<p class=\"no-margin\">When you start the bot for the first time, the standard/defaulted slippage is set to 15%. Please adjust the slippage to your token's volatility, sometimes you have to adjust slippage in trades you are taking.</p>",
+            "author_id": 7303886,
+            "state": "published",
+            "created_at": 1713474898,
+            "updated_at": 1714854101,
+            "url": "https://intercom.help/trojan-support/en/articles/9218183-what-is-recommended-slippage"
+        },
+        {
+            "id": "9218162",
+            "type": "article",
+            "workspace_id": "jr583c8b",
+            "parent_id": 9236552,
+            "parent_type": "collection",
+            "parent_ids": [
+                9236552
+            ],
+            "title": "What is slippage?",
+            "description": "",
+            "body": "<p class=\"no-margin\">Slippage is how much the price can change while you're making a trade. It's important because it depends on how fast your trade goes, how much money is involved, and making sure no one cheats.</p>\n<p class=\"no-margin\"></p>\n<p class=\"no-margin\">Our bot usually sets the slippage to 15%. We figured out this number by looking at lots of trades. But you can change it to fit how you like to trade. If your trades are taking too long or not going through because of slippage, you might want to raise the slippage setting.</p>",
+            "author_id": 7303886,
+            "state": "published",
+            "created_at": 1713474634,
+            "updated_at": 1714853280,
+            "url": "https://intercom.help/trojan-support/en/articles/9218162-what-is-slippage"
+        },
+        {
+            "id": "9218156",
+            "type": "article",
+            "workspace_id": "jr583c8b",
+            "parent_id": 9236552,
+            "parent_type": "collection",
+            "parent_ids": [
+                9236552
+            ],
+            "title": "Where can i find my private key?",
+            "description": "",
+            "body": "<p class=\"no-margin\"><b>Note: Don't give anyone Private keys of your wallets, they can access and withdraw your assets! </b><a href=\"https://help.phantom.app/hc/en-us/articles/13515761228051-Security-Tips-for-Phantom-users\" target=\"_blank\" class=\"intercom-content-link\">Click for Security Tips</a></p>\n<ol>\n<li>\n<p class=\"no-margin\">Go to main menu (type /start) and click on \"Settings\", then press \"Wallets\".</p>\n</li>\n<li>\n<p class=\"no-margin\">Click \"Export Private Keys\".</p>\n</li>\n<li>\n<p class=\"no-margin\">Read the warning provided surrounding your personal security ensuring that you are solely responsible for your wallet now that you have exported keys out of our system!</p>\n</li>\n<li>\n<p class=\"no-margin\">When you ready, click \"Show Private Keys\" to see the private keys of your Solana and Ethereum Wallets.</p>\n</li>\n</ol><p class=\"no-margin\"></p>\n<p class=\"no-margin\"><b>Important</b>: Exporting private keys from Trojan on Solana relinquishes the platform's responsibility for the security of your assets. Trojan will not be held accountable for any loss, theft, or misuse of funds resulting from exported private keys. Take precautions to safeguard your private keys securely.</p>",
+            "author_id": 7303886,
+            "state": "published",
+            "created_at": 1713474557,
+            "updated_at": 1714855343,
+            "url": "https://intercom.help/trojan-support/en/articles/9218156-where-can-i-find-my-private-key"
+        }
+    ]
+}
