@@ -4,9 +4,13 @@ import os
 import aiohttp
 import asyncio
 import sys
+import random
+from contextlib import suppress
 from dotenv import load_dotenv
 from quart import Quart, jsonify, request
 from telethon import TelegramClient, events
+from telethon.errors import RPCError, ChatAdminRequiredError, ChannelPrivateError
+from telethon.tl.types import PeerChannel
 from langchain_community.vectorstores import Chroma
 from langchain_community.embeddings import GPT4AllEmbeddings
 from langchain_core.prompts import PromptTemplate
@@ -22,6 +26,8 @@ import time
 os.makedirs('logs', exist_ok=True)
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s')
 
+start_time = time.time()
+
 app = Quart(__name__)
 load_dotenv()
 
@@ -29,10 +35,15 @@ api_id = os.getenv('API_ID')
 api_hash = os.getenv('API_HASH')
 bot_token = os.getenv('BOT_TOKEN')
 intercom_token = os.getenv('INTERCOM_TOKEN')
+chat_id = int(os.getenv('CHAT_ID'))  # Convert chat_id to integer
 
 client = TelegramClient('logs/tg_chat', api_id, api_hash)
 
 vectorstore = None
+
+def generate_random_long():
+    """Generate a random long integer."""
+    return random.getrandbits(64)
 
 async def fetch_all_pages():
     url = 'https://api.intercom.io/articles'
@@ -46,7 +57,7 @@ async def fetch_all_pages():
         while url:
             async with session.get(url, headers=headers) as response:
                 data = await response.json()
-                all_data.extend(data.get('data', []))  # Collect data for writing to file
+                all_data.extend(data.get('data', [])) 
                 if 'data' in data and data['data']:
                     documents = [Document(page_content=article["body"]) for article in data["data"] if article["body"].strip()]
                     all_documents.extend(documents)
@@ -54,7 +65,6 @@ async def fetch_all_pages():
                     url = data['pages']['next']
                 else:
                     break
-    # Write the fetched data to info.json
     with open('info.json', 'w') as f:
         json.dump(all_data, f, indent=2)
     logging.info(f"Total records received: {len(all_data)}")
@@ -145,14 +155,32 @@ async def answer_query(event):
 @client.on(events.NewMessage(pattern='/rebuild'))
 async def rebuild_vectorstore_command(event):
     logging.info("Received /rebuild command. Rebuilding the vector store...")
-    await event.respond("alright, shut up for a second then")
+    await event.respond("rebuilding database")
     await rebuild_vectorstore()
-    await event.respond("k, all done.")
+    await event.respond("database rebuilt")
 
 async def run_server():
     config = Config()
     config.bind = ["0.0.0.0:5001"]
-    await serve(app, config)
+    
+    async def custom_serve():
+        end_time = time.time()
+        time_to_boot = end_time - start_time
+        await send_message(chat_id, f'<span style="color:red">Bot Online, Time to boot: {time_to_boot:.2f} seconds</span>')
+        await serve(app, config)
+
+    await custom_serve()
+
+async def send_message(chat_id, message):
+    try:
+        entity = await client.get_entity(PeerChannel(chat_id))
+        await client.send_message(entity, message, parse_mode='html')
+    except ChatAdminRequiredError:
+        logging.error(f"Failed to send message to {chat_id}: Bot lacks admin rights.")
+    except ChannelPrivateError:
+        logging.error(f"Failed to send message to {chat_id}: Channel is private.")
+    except RPCError as e:
+        logging.error(f"Failed to send message to {chat_id}: {str(e)}")
 
 async def start():
     try:
@@ -169,10 +197,25 @@ async def main():
         await start()
     except KeyboardInterrupt:
         logging.info("Script interrupted by user.")
+        await send_message(chat_id, '<span style="color:red">Shutting Down</span>')
     finally:
+        logging.info("Shutting down...")
+        await client.disconnect()
+        logging.info("Client disconnected.")
+        pending = [task for task in asyncio.all_tasks() if not task.done() and task is not asyncio.current_task()]
+        for task in pending:
+            task.cancel()
+        await asyncio.gather(*pending, return_exceptions=True)
+        loop.stop()
+        loop.close()
         logging.info("Script stopped.")
 
 if __name__ == '__main__':
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(main())
-    loop.close()
+    try:
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(main())
+    except RuntimeError as e:
+        logging.error(f"Runtime error: {str(e)}")
+    finally:
+        if not loop.is_closed():
+            loop.close()
