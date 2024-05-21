@@ -1,17 +1,6 @@
-
-
-## Scripts Description
-
 ### Telegram/Intercom Chat Bot (`chatbot.py`)
 Usesthe LangChain + Ollama/Llama 3 for language model processing and RAG. The script pulls current articles from the specified repository and builds a new vectordb to pull answers from.
 
-
-## Clone Repo
-Clone the repository
-```bash
-git clone <repository-url>
-cd <repository-directory>
-```
 
 ## GitHub CLI Installation
 Set up keyrings and repository:
@@ -59,13 +48,13 @@ OUTPUT_CHANNEL_ID=@YourChannel
 INTERCOM_TOKEN=<INTERCOM_TOKEN>" > .env
 ```
 
-## Start Chatbot
+## Start Chatbot, Tunnel, Ollama, and Posting Bot
 Install Python dependencies and start services:
 ```bash
-pip install -r requirements.txt &
-ngrok http --domain=boom.ngrok.app 127.0.0.1:5001 &
+ngrok http --domain=domain.ngrok.app 127.0.0.1:5001 &
 ollama serve > logs/ollama.log 2>&1 &
 python3 chatbot.py > logs/chatbot.log 2>&1 &
+python3 tg_post.py > logs/tg_post.log 2>&1 &
 
 ```
 
@@ -74,18 +63,4 @@ python3 chatbot.py > logs/chatbot.log 2>&1 &
 pkill python3
 pkill ngrok
 pkill ollama
-```
-
-## View Logs
-```bash
-tail -f logs/chatbot.log
-```
-
-## To-Do List
-```bash
-Build unified start-up/reboot process.
-Refine initial install approach
-Stress test 
-Redo scripts to regularly pull new articles without reboot
-Refine tg_post.py
 ```

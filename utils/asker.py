@@ -85,7 +85,6 @@ async def handle_query(query):
     result = qa_chain.invoke(query)
     logging.info(f"Query result: {result}")
 
-    # Handling result based on its type
     if isinstance(result, dict):
         if 'result' in result:
             result = result['result']
@@ -101,17 +100,14 @@ async def handle_query(query):
 
     return {"response": result, "id": "1234"}
 
-# Load questions from a CSV file
 questions_df = pd.read_csv('questions.csv')
 
-# Check if 'question' column exists, if not print available columns
 if 'question' not in questions_df.columns:
     logging.error(f"'question' column not found in CSV. Available columns: {questions_df.columns}")
     raise KeyError(f"'question' column not found in CSV. Available columns: {questions_df.columns}")
 
 questions = questions_df['question'].tolist()
 
-# Function to test questions and save responses to a spreadsheet
 async def test_questions_and_save_to_spreadsheet(questions):
     start_time = time.time()  # Start timing
     results = []
@@ -120,16 +116,12 @@ async def test_questions_and_save_to_spreadsheet(questions):
         response = result["response"]
         results.append({"question": question, "response": response, "id": result["id"]})
     
-    # Convert results to a DataFrame and save to Excel
     df = pd.DataFrame(results)
     df.to_excel("responses.xlsx", index=False)
 
-    # End timing and calculate duration
     end_time = time.time()
     duration = end_time - start_time
 
-    # Print the duration and number of questions processed
     print(f"Processed {len(questions)} questions in {duration:.2f} seconds.")
 
-# Run the function to test questions and save responses
 asyncio.run(test_questions_and_save_to_spreadsheet(questions))

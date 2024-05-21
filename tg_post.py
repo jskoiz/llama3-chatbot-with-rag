@@ -5,23 +5,18 @@ import os
 from dotenv import load_dotenv
 import logging
 
-# Setup basic logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-# Load environment variables
 load_dotenv()
 
-# API credentials for Telegram
 api_id = os.getenv('API_ID')
 api_hash = os.getenv('API_HASH')
 bot_token = os.getenv('BOT_TOKEN')
 intercom_token = os.getenv('INTERCOM_TOKEN')
 
-# Initialize the Telegram Client with session file stored in 'logs' directory
 client = TelegramClient('logs/tg_post', api_id, api_hash)
 client.start(bot_token=bot_token)
 
-# Store conversation state
 conversation_state = {}
 
 @client.on(events.NewMessage(pattern='^/start$'))
@@ -88,7 +83,6 @@ async def process_user_input(event):
 async def create_article(event, article_data):
     logging.info(f"Creating article with data: {article_data}")
 
-    # Define the API URL and headers
     url = "https://api.intercom.io/articles"
     headers = {
         "Authorization": f"Bearer {intercom_token}",
@@ -97,7 +91,6 @@ async def create_article(event, article_data):
         "Intercom-Version": "2.10"
     }
 
-    # Make the POST request to create an article
     response = requests.post(url, headers=headers, json=article_data)
     logging.info(f"HTTP POST Request sent. Status Code: {response.status_code}")
 
@@ -110,5 +103,4 @@ async def create_article(event, article_data):
         await event.respond(error_message)
         logging.error(error_message)
 
-# Run the client until it is disconnected
 client.run_until_disconnected()
