@@ -3,7 +3,6 @@ import logging
 import os
 import aiohttp
 import asyncio
-import random
 from contextlib import suppress
 from dotenv import load_dotenv
 from quart import Quart, jsonify, request
@@ -29,7 +28,6 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s', hand
     logging.StreamHandler()
 ])
 
-# Define start time globally
 start_time = time.time()
 
 # Load environment variables
@@ -42,14 +40,11 @@ chat_id = int(os.getenv('CHAT_ID'))
 
 app = Quart(__name__)
 
-# Initialize Telegram client
 client = TelegramClient('logs/tg_chat', api_id, api_hash)
 
-# Initialize vector store and LLM variables
 vectorstore = None
 qa_chain = None
 
-# Template for prompt
 template = """Answer the question based on the provided context. Do not include introductory phrases. If the question is unclear or unrelated to the context, ask the user to rephrase or provide more details.
 
 Context:
@@ -217,7 +212,7 @@ async def main():
         logging.info("Shutting down...")
         await client.disconnect()
         logging.info("Client disconnected.")
-        pending = [task for task in asyncio.all_tasks() if not task.done() and task is not asyncio.current_task()]
+        pending = [task for task in asyncio.all_tasks() if not task done() and task is not asyncio.current_task()]
         for task in pending:
             task.cancel()
         await asyncio.gather(*pending, return_exceptions=True)
