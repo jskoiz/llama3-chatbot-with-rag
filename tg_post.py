@@ -79,6 +79,9 @@ async def process_user_input(event):
             conversation_state[sender_id]["step"] = "publish"
             await event.respond(f"Current Article State:\nTitle: {article_data['title']}\nDescription: {article_data['description']}\nBody: {article_data['body']}\n\nPerfect! Do you want to publish the article or save it as a draft?",
                                 buttons=[Button.inline("Publish", "publish"), Button.inline("Draft", "draft"), Button.inline("Cancel", "cancel")])
+    elif user_input.startswith('/delete '):
+        article_id = user_input.split()[1]
+        await delete_article(event, article_id)
 
 async def create_article(event, article_data):
     logging.info(f"Creating article with data: {article_data}")
@@ -100,6 +103,27 @@ async def create_article(event, article_data):
         logging.info("Article created successfully with the response: " + response.text)
     else:
         error_message = f"Failed to create article. Status code: {response.status_code}, Response: {response.text}"
+        await event.respond(error_message)
+        logging.error(error_message)
+
+async def delete_article(event, article_id):
+    logging.info(f"Deleting article with ID: {article_id}")
+
+    url = f"https://api.intercom.io/articles/{article_id}"
+    headers = {
+        "Authorization": f"Bearer {intercom_token}",
+        "Accept": "application/json",
+        "Intercom-Version": "2.10"
+    }
+
+    response = requests.delete(url, headers=headers)
+    logging.info(f"HTTP DELETE Request sent. Status Code: {response.status_code}")
+
+    if response.status_code == 204:
+        await event.respond(f"Article with ID {article_id} deleted successfully.")
+        logging.info(f"Article with ID {article_id} deleted successfully.")
+    else:
+        error_message = f"Failed to delete article. Status code: {response.status_code}, Response: {response.text}"
         await event.respond(error_message)
         logging.error(error_message)
 

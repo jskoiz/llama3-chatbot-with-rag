@@ -20,47 +20,33 @@ from hypercorn.config import Config
 from hypercorn.asyncio import serve
 import time
 
-# Configure logging
 os.makedirs('logs', exist_ok=True)
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s', handlers=[
     logging.FileHandler("logs/app.log"),
     logging.StreamHandler()
 ])
 
-# Define start time globally
 start_time = time.time()
 
-# Load environment variables
+# .env
 load_dotenv()
 api_id = os.getenv('API_ID')
 api_hash = os.getenv('API_HASH')
 bot_token = os.getenv('BOT_TOKEN')
 intercom_token = os.getenv('INTERCOM_TOKEN')
 chat_id = int(os.getenv('CHAT_ID'))
+qa_chain_prompt_template = os.getenv('QA_CHAIN_PROMPT_TEMPLATE')
 
 app = Quart(__name__)
 
-# Initialize Telegram client
 client = TelegramClient('logs/tg_chat', api_id, api_hash)
 
-# Initialize vector store and LLM variables
 vectorstore = None
 qa_chain = None
 
-# Template for prompt
-template = """Answer the question based on the provided context. Do not include introductory phrases. If the question is unclear or unrelated to the context, ask the user to rephrase or provide more details.
-
-Context:
-{context}
-
-Question:
-{question}
-
-Answer:"""
-
 QA_CHAIN_PROMPT = PromptTemplate(
     input_variables=["context", "question"],
-    template=template,
+    template=qa_chain_prompt_template,
 )
 
 llm = Ollama(model="trojan-chat-bot", callback_manager=CallbackManager([StreamingStdOutCallbackHandler()]))
