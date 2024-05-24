@@ -20,7 +20,8 @@ from langchain_community.document_loaders import JSONLoader
 from hypercorn.config import Config
 from hypercorn.asyncio import serve
 import time
-from bs4 import BeautifulSoup 
+from bs4 import BeautifulSoup
+from urllib.parse import urlparse
 
 os.makedirs('logs', exist_ok=True)
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s', handlers=[
@@ -55,6 +56,15 @@ QA_CHAIN_PROMPT = PromptTemplate(
 
 llm = Ollama(model="trojan-chat-bot", callback_manager=CallbackManager([StreamingStdOutCallbackHandler()]))
 
+def strip_html(content):
+    """Strips HTML tags from content using BeautifulSoup, with checks for filenames and URLs."""
+    # Check if content looks like a filename or URL
+    if os.path.isfile(content) or urlparse(content).scheme in ['http', 'https']:
+        return content
+    else:
+        soup = BeautifulSoup(content, "html.parser")
+        return soup.get_text()
+
 async def fetch_all_pages():
     url = 'https://api.intercom.io/articles'
     headers = {
@@ -72,7 +82,7 @@ async def fetch_all_pages():
                 all_data.extend(data.get('data', []))
                 url = data.get('pages', {}).get('next', None)
     
-
+    # Strip HTML from all fields in the JSON data
     for item in all_data:
         for key, value in item.items():
             if isinstance(value, str):
@@ -87,13 +97,8 @@ def metadata_func(record: dict, metadata: dict) -> dict:
     metadata["title"] = record.get("title")
     metadata["author_id"] = record.get("author_id")
     metadata["created_at"] = record.get("created_at")
-    metadata["id"] = record.get("id")  
+    metadata["id"] = record.get("id")
     return metadata
-
-def strip_html(content):
-    """Strips HTML tags from content using BeautifulSoup."""
-    soup = BeautifulSoup(content, "html.parser")
-    return soup.get_text()
 
 class CustomGPT4AllEmbeddings(GPT4AllEmbeddings):
     def __call__(self, input):
@@ -113,13 +118,14 @@ async def rebuild_vectorstore():
         
         data = loader.load()
         
-     
+        # Filter out documents with empty or None page_content and strip HTML
         valid_documents = []
         invalid_documents = []
         for d in data:
             if d.page_content and d.page_content.strip():
                 stripped_content = strip_html(d.page_content)
-                if stripped_content.strip():  
+                if stripped_content.strip():  # Ensure the stripped content is not empty
+                    # Include the ID in the page content for debugging purposes
                     page_content_with_id = f"ID: {d.metadata['id']}\n{stripped_content}"
                     valid_documents.append(Document(page_content=page_content_with_id, metadata=d.metadata))
                 else:
@@ -133,7 +139,7 @@ async def rebuild_vectorstore():
             logging.warning(f"Invalid document: {invalid}")
         
         if valid_documents:
-            embedder = CustomGPT4AllEmbeddings(model="all-MiniLM-L6-v2.gguf") 
+            embedder = CustomGPT4AllEmbeddings(model="all-MiniLM-L6-v2.gguf")  # Ensure you have the correct model path
             logging.info("Generating embeddings for documents...")
             embeddings = embedder.embed_documents([doc.page_content for doc in valid_documents])
 
@@ -206,6 +212,14 @@ async def rebuild_vectorstore_handler():
     await rebuild_vectorstore()
     return jsonify({"message": "Vector store rebuilt"}), 200
 
+@client.on(events.NewMessage(pattern='/startall'))
+async def start_all_services(event):
+    try:
+        os.system('./start_services.sh')
+        await event.respond("All services restarted successfully.")
+    except Exception as e:
+        await event.respond(f"Failed to restart services: {str(e)}")
+
 @client.on(events.NewMessage(pattern=r'^\.x (.+)', func=lambda e: e.text.lower().startswith('.x ')))
 async def answer_query(event):
     query = event.pattern_match.group(1)
@@ -225,7 +239,7 @@ async def rebuild_vectorstore_command(event):
 async def run_server():
     global start_time
     config = Config()
-    config.bind = ["0.0.0.0:5001"]
+    config.bind = ["0.0.0.0:5001"]  # Change to an available port
     
     async def custom_serve():
         end_time = time.time()
