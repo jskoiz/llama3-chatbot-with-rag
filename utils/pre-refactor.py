@@ -39,7 +39,7 @@ api_hash = os.getenv('API_HASH')
 bot_token = os.getenv('BOT_TOKEN')
 intercom_token = os.getenv('INTERCOM_TOKEN')
 chat_id = int(os.getenv('CHAT_ID'))
-qa_chain_prompt_template = os.getenv('QA_CHAIN_PROMPT_TEMPLATE')
+qa_chain_prompt_template = os.getenv('PROMPT_TEMPLATE')
 
 app = Quart(__name__)
 

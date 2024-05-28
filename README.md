@@ -1,66 +1,64 @@
-### Telegram/Intercom Chat Bot (`chatbot.py`)
-Usesthe LangChain + Ollama/Llama 3 for language model processing and RAG. The script pulls current articles from the specified repository and builds a new vectordb to pull answers from.
+# Intercom AI Chat Bot
 
+## Overview
 
-## GitHub CLI Installation
-Set up keyrings and repository:
-```bash
-sudo mkdir -p -m 755 /etc/apt/keyrings &&
-wget -qO- https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null &&
-sudo chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg &&
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null &&
-sudo apt update &&
-sudo apt install gh -y
-```
+The bot uses a vector store to provide relevant answers based on the data fetched from Intercom articles. It also serves a web server and utilizes ngrok for exposing the local server to the internet.
 
-## Ollama Setup
-Install Ollama and download the Llama3 Model:
-```bash
-curl -fsSL https://ollama.com/install.sh | sh
-ollama pull llama3
-```
-Create Trojan Chat Bot from Modelfile (trojan-bot file in root directory):
-```bash
-ollama create trojan-chat-bot -f trojan-bot
-```
+## Repository Structure
 
-## Ngrok Installation
-Set up repository and install Ngrok:
-```bash
-curl -s https://ngrok-agent.s3.amazonaws.com/ngrok.asc | sudo tee /etc/apt/trusted.gpg.d/ngrok.asc >/dev/null &&
-echo "deb https://ngrok-agent.s3.amazonaws.com buster main" | sudo tee /etc/apt/sources.list.d/ngrok.list &&
-sudo apt update &&
-sudo apt install ngrok
-```
-Authenticate Ngrok (replace `<TOKEN>` with your actual token):
-```bash
-ngrok config add-authtoken <TOKEN>
-```
+- `main.py`: The main script to start the bot, server, and manage subprocesses for `ollama` and `ngrok`.
+- `telegram_bot.py`: Handles Telegram bot functionality and communication.
+- `data_processor.py`: Fetches and processes data from Intercom.
+- `utils.py`: Utility functions including HTML stripping.
+- `vector_store.py`: Manages the vector store and embedding generation.
+- `web_server.py`: Serves the web API using Quart and Hypercorn.
 
-## Environment Setup
-Install text editor (optional) and create environment variables file:
-```bash
-sudo apt install nano
-echo -e "API_ID=<API_ID>
-API_HASH=<API_HASH>
-BOT_TOKEN=<BOT_TOKEN>
-OUTPUT_CHANNEL_ID=@YourChannel
-INTERCOM_TOKEN=<INTERCOM_TOKEN>" > .env
-```
+## Setup
 
-## Start Chatbot, Tunnel, Ollama, and Posting Bot
-Install Python dependencies and start services:
-```bash
-ngrok http --domain=domain.ngrok.app 127.0.0.1:5001 &
-ollama serve > logs/ollama.log 2>&1 &
-python3 chatbot.py > logs/chatbot.log 2>&1 &
-python3 tg_post.py > logs/tg_post.log 2>&1 &
+### Prerequisites
 
-```
+- Python 3.10+
+- `pip` package manager
+- An Intercom account and API token
+- Telegram Bot API credentials
+- `ngrok` for exposing the local server
 
-## Stop All Services
+### Installation
+
+1. Clone the repository:
+
+    ```bash
+    git clone https://github.com/your-username/trojan-intercom-bot.git
+    cd trojan-intercom-bot
+    ```
+
+2. Create and activate a virtual environment:
+
+    ```bash
+    python3 -m venv venv
+    source venv/bin/activate  # On Windows: venv\Scripts\activate
+    ```
+
+3. Install the required dependencies:
+
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+4. Create a `.env` file in the root directory and add your environment variables:
+
+    ```ini
+    API_ID=your_telegram_api_id
+    API_HASH=your_telegram_api_hash
+    BOT_TOKEN=your_telegram_bot_token
+    CHAT_ID=your_chat_id
+    INTERCOM_TOKEN=your_intercom_token
+    PROMPT_TEMPLATE="Your prompt template here"
+    ```
+
+## Usage
+
+To start the bot and the server, run:
+
 ```bash
-pkill python3
-pkill ngrok
-pkill ollama
-```
+python3 main.py
