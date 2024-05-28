@@ -1,0 +1,62 @@
+name: Pylint
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.8", "3.9", "3.10"]
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v3
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    - name: Install GitHub CLI
+      run: |
+        sudo mkdir -p -m 755 /etc/apt/keyrings &&
+        wget -qO- https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null &&
+        sudo chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg &&
+        echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null &&
+        sudo apt update &&
+        sudo apt install gh -y
+    - name: Install Ollama
+      run: |
+        curl -fsSL https://ollama.com/install.sh | sh
+    - name: Start Ollama serve
+      run: |
+        nohup ollama serve &
+    - name: Pull Llama3 model
+      run: |
+        ollama pull llama3
+    - name: Create Trojan model
+      run: |
+        ollama create trojan-chat-bot -f trojan-bot
+    - name: Install Ngrok
+      run: |
+        curl -s https://ngrok-agent.s3.amazonaws.com/ngrok.asc \
+        | sudo tee /etc/apt/trusted.gpg.d/ngrok.asc >/dev/null \
+        && echo "deb https://ngrok-agent.s3.amazonaws.com buster main" \
+        | sudo tee /etc/apt/sources.list.d/ngrok.list \
+        && sudo apt update \
+        && sudo apt install ngrok
+    - name: Ngrok Auth
+      run: |
+        ngrok config add-authtoken ${{ secrets.NGROK_AUTH_TOKEN }}
+    - name: Create .env file
+      run: |
+        echo "API_ID=${{ secrets.TELEGRAM_API_ID }}" >> .env
+        echo "API_HASH=${{ secrets.TELEGRAM_API_HASH }}" >> .env
+        echo "BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }}" >> .env
+        echo "CHAT_ID=${{ secrets.TELEGRAM_CHAT_ID }}" >> .env
+        echo "INTERCOM_TOKEN=${{ secrets.INTERCOM_TOKEN }}" >> .env
+        echo "PROMPT_TEMPLATE=\"${{ secrets.PROMPT_TEMPLATE }}\"" >> .env
+    - name: Analyzing the code with pylint
+      run: |
+        pylint $(git ls-files '*.py')
