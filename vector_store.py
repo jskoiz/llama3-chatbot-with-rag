@@ -1,4 +1,5 @@
 # vector_store.py
+import json
 import logging
 from bs4 import BeautifulSoup
 from langchain_community.vectorstores import Chroma
@@ -10,6 +11,7 @@ from langchain_community.document_loaders import JSONLoader
 from langchain_community.llms import Ollama
 from langchain.callbacks.manager import CallbackManager
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
+from langchain_community.vectorstores.utils import filter_complex_metadata
 
 def metadata_func(record: dict, metadata: dict) -> dict:
     metadata["title"] = record.get("title")
@@ -22,6 +24,20 @@ def strip_html(content):
     """Strips HTML tags from content using BeautifulSoup."""
     soup = BeautifulSoup(content, "html.parser")
     return soup.get_text()
+
+def clean_metadata(metadata):
+    """Ensure metadata values are strings, ints, floats, or bools."""
+    cleaned_metadata = {}
+    for k, v in metadata.items():
+        if isinstance(v, (str, int, float, bool)):
+            cleaned_metadata[k] = v
+        elif isinstance(v, list):
+            cleaned_metadata[k] = ', '.join(map(str, v))  # Convert list to a comma-separated string
+        elif v is None:
+            cleaned_metadata[k] = ''  # Replace None with empty string
+        else:
+            cleaned_metadata[k] = str(v)  # Convert other types to string
+    return cleaned_metadata
 
 class CustomGPT4AllEmbeddings(GPT4AllEmbeddings):
     def __call__(self, input):
@@ -36,22 +52,22 @@ async def rebuild_vectorstore(json_file_path, prompt_template, embedding_log_fil
     )
 
     try:
-        loader = JSONLoader(
-            file_path=json_file_path,
-            jq_schema='.[]',
-            content_key="body",
-            metadata_func=metadata_func
-        )
-        data = loader.load()
+        with open(json_file_path, 'r') as f:
+            data = json.load(f)
+
+        # Ensure the data is a list of dictionaries
+        if not isinstance(data, list) or not all(isinstance(item, dict) for item in data):
+            raise ValueError(f"Expected a list of dictionaries, but got {type(data)} with content {data}")
 
         valid_documents = []
         invalid_documents = []
         for d in data:
-            if d.page_content and d.page_content.strip():
-                stripped_content = strip_html(d.page_content)
+            if d.get("body") and d["body"].strip():
+                stripped_content = strip_html(d["body"])
                 if stripped_content.strip():
-                    page_content_with_id = f"ID: {d.metadata['id']}\n{stripped_content}"
-                    valid_documents.append(Document(page_content=page_content_with_id, metadata=d.metadata))
+                    page_content_with_id = f"ID: {d.get('id')}\n{stripped_content}"
+                    metadata = clean_metadata(d)
+                    valid_documents.append(Document(page_content=page_content_with_id, metadata=metadata))
                 else:
                     invalid_documents.append(d)
             else:
@@ -88,6 +104,7 @@ async def rebuild_vectorstore(json_file_path, prompt_template, embedding_log_fil
         else:
             logging.error("No valid documents with non-empty body found.")
     except Exception as e:
-        logging.error(f"Error rebuilding vector store: {str(e)}")
+        logging.error(f"Error rebuilding vector store: {str(e)}", exc_info=True)
+        raise
 
     return qa_chain

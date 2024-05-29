@@ -18,8 +18,14 @@ async def fetch_all_pages(intercom_token):
                     logging.error(f"Failed to fetch data: {response.status}")
                     break
                 data = await response.json()
-                all_data.extend(data.get('data', []))
+                articles = data.get('data', [])
+                all_data.extend(articles)
                 url = data.get('pages', {}).get('next', None)
+
+    # Check to ensure all_data is a list of dictionaries
+    if not all(isinstance(item, dict) for item in all_data):
+        logging.error("Fetched data is not a list of dictionaries.")
+        return None
 
     with open('info.json', 'w') as f:
         json.dump(all_data, f, indent=2)

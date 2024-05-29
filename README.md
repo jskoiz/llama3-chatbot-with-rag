@@ -56,6 +56,13 @@ The bot uses a vector store to provide relevant answers based on the data fetche
     PROMPT_TEMPLATE="Your prompt template here"
     ```
 
+4. Create an Ollama modelfile.
+
+    ```bash
+    ollama pull llama3
+    ollama create trojan-chat-bot -f trojan-bot
+    ```
+
 ## Usage
 
 To start the bot and the server, run:
