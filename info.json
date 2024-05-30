@@ -486,13 +486,13 @@
     "parent_id": null,
     "parent_type": null,
     "parent_ids": [],
-    "title": "Can I use Trojan on BASE?",
+    "title": "Can I trade on BASE?",
     "description": "Can I use Trojan on BASE?",
-    "body": "<p class=\"no-margin\">At the current moment, Trojan do not support BASE chain. However, we're planning on expanding to BASE and other EVM chains in the near future.</p>",
+    "body": "<p class=\"no-margin\">At the current moment, BASE chain is not supported for trading tokens whatsoever. However, we're planning on expanding out bot services to BASE and other EVM chains in the near future.</p>",
     "author_id": 7337742,
     "state": "draft",
     "created_at": 1716301268,
-    "updated_at": 1716301365,
+    "updated_at": 1717098120,
     "url": null
   },
   {

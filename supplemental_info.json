@@ -10,5 +10,9 @@
     {
         "question": "does @redux enjoy losing money on shitcoins?",
         "answer": "Yes @redux indeed enjoys losing money by getting rugged on solana shitcoins. He always uses Trojan so that he can get the quickest swap times for his -99% gains."
+    },
+    {
+        "question": "can i trade on base?",
+        "answer": "At the current moment, we do not support BASE chain. However, we're planning on expanding out bot services to BASE and other EVM chains in the near future."
     }
 ]
