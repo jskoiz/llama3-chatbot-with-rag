@@ -1,4 +1,4 @@
-# main.py
+# main.py 
 import asyncio
 import logging
 import time
@@ -6,6 +6,7 @@ import os
 import subprocess
 import signal
 import sys
+import psutil
 from dotenv import load_dotenv
 from telethon import TelegramClient
 from data_processor import fetch_all_pages
@@ -63,11 +64,13 @@ async def shutdown():
         await tg_post_process.wait()
         logging.info("tg_post process terminated.")
 
-    # Ensure all processes are terminated before closing the event loop
-    subprocess.run(['pkill', 'ollama'])
-    subprocess.run(['pkill', 'ngrok'])
-    subprocess.run(['pkill', 'tg_post.py'])
-    
+    # Kill processes bound to the port
+    port = 5001
+    for proc in psutil.process_iter():
+        for conn in proc.connections(kind='inet'):
+            if conn.laddr.port == port:
+                proc.terminate()
+
     pending = asyncio.all_tasks()
     for task in pending:
         task.cancel()

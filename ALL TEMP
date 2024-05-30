@@ -1,0 +1,709 @@
+1. admin_bot.py
+This script is a management bot for administering the main chatbot. It uses the Telegram API to provide commands for starting, stopping, and rebooting the main chatbot, as well as downloading and deleting articles from Intercom.
+
+Functions:
+admin_command(event): Displays admin commands.
+callback_handler(event): Handles admin command callbacks.
+start_bot(event): Starts the main chatbot.
+stop_bot(event): Stops the main chatbot.
+reboot_bot(event): Reboots the main chatbot.
+download_db(event): Downloads the Intercom articles database.
+delete_article_prompt(event): Prompts for an article ID to delete.
+delete_article(event, article_id): Deletes the specified Intercom article.
+2. main.py
+This script runs the main chatbot. It initializes the Telegram client, fetches data, rebuilds the vector store, and handles signal interruptions for graceful shutdown.
+
+Functions:
+handle_signal(signal, frame): Handles termination signals for shutdown.
+shutdown(): Gracefully shuts down the main components.
+start_subprocess(command): Starts a subprocess for a given command.
+main(): Main function to start all components and run the web server.
+3. data_processor.py
+This script fetches all pages from the Intercom API and saves the articles to a JSON file.
+
+Functions:
+fetch_all_pages(intercom_token): Fetches all articles from Intercom and saves them to info.json.
+4. telegram_bot.py
+This script handles Telegram interactions for the chatbot, including answering queries and admin commands for rebuilding the vector store and managing articles.
+
+Functions:
+start_telegram_client(api_id, api_hash, bot_token, chat_id, qa_chain_instance): Starts the Telegram client and initializes handlers for various commands and queries.
+send_message(client, chat_id, message): Sends messages to the specified chat.
+handle_query(query): Handles user queries by invoking the QA chain.
+5. utils.py
+This script provides utility functions, such as stripping HTML tags from content.
+
+Functions:
+strip_html(content): Strips HTML tags from the provided content.
+6. vector_store.py
+This script handles rebuilding the vector store from Intercom articles and initializing the QA chain.
+
+Functions:
+metadata_func(record, metadata): Extracts metadata from a record.
+strip_html(content): Strips HTML tags from content.
+clean_metadata(metadata): Cleans and standardizes metadata values.
+rebuild_vectorstore(json_file_path, prompt_template, embedding_log_file): Rebuilds the vector store from the articles in info.json and initializes the QA chain.
+7. web_server.py
+This script runs a web server using Quart, providing endpoints for handling queries and rebuilding the vector store.
+
+Functions:
+intercom_handler(): Handles incoming queries and returns responses.
+rebuild_vectorstore_handler(): Rebuilds the vector store on request.
+run_server(): Runs the Quart web server.
+Each script plays a vital role in managing, running, and maintaining the chatbot and its associated functionalities.
+
+# admin_bot.py / this is a management bot that serves to start/stop the main chatbot
+import logging
+import os
+import subprocess
+import time
+import requests
+import json
+from dotenv import load_dotenv
+from telethon import TelegramClient, events, Button
+
+# Load environment variables
+load_dotenv()
+
+# Variables used
+admin_api_id = os.getenv('ADMIN_API_ID')
+admin_api_hash = os.getenv('ADMIN_API_HASH')
+admin_bot_token = os.getenv('ADMIN_BOT_TOKEN')
+intercom_token = os.getenv('INTERCOM_TOKEN')
+
+# Variable check
+if not admin_api_id or not admin_api_hash or not admin_bot_token:
+    raise ValueError("Your ADMIN_API_ID, ADMIN_API_HASH, or ADMIN_BOT_TOKEN is not set in the .env file")
+
+client = TelegramClient('admin_bot', admin_api_id, admin_api_hash)
+client.start(bot_token=admin_bot_token)
+
+MAIN_BOT_SCRIPT = 'main.py'
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s')
+
+stats = {
+    "start_time": time.time(),
+    "last_restart": "Never",
+    "last_rebuild": "Never",
+    "total_queries": 0,
+    "articles_pulled": 0
+}
+
+article_deletion_state = {}
+
+@client.on(events.NewMessage(pattern='/admin'))
+async def admin_command(event):
+    logging.info("Admin command received")
+    
+    message = (
+        "<b>Admin Bot for the Chat Bot is a mangement tool designed to allow easy rebooting and other basic mangement options of the main AI Chat Bot.</b>\n\n"
+        "🚀 <b>Start Bot</b>:\nStart the main bot. Use .x followed by your query to use the AI chat bot.\n\n"
+        "🔄 <b>Reboot Bot</b>:\nRestart the main bot. Useful if the responses start getting weird.\n\n"
+        "💾 <b>Download DB</b>:\nDownload the database. Downloads a info.json file and shares it in this chat. Contains all intercom articles currently being used by the AI chat bot.\n\n"
+        "🗑️ <b>Delete Article</b>:\nDelete an article from Intercom, works for both draft and live articles. You can find the article ID from the article's URL and grabbing the string of numbers from it. Just respond to the bot after clicking 'Delete Article' with the correct Article ID and it will be deleted."
+    )
+
+    await event.respond(message, parse_mode='html')
+
+    buttons = [
+        [Button.inline("🚀 Start Bot", b"start_bot"), Button.inline("🔄 Reboot Bot", b"reboot_bot")],
+        [Button.inline("💾 Download DB", b"download_db"), Button.inline("🗑️ Delete Article", b"delete_article")]
+    ]
+
+    await event.respond("**Choose an action:**", buttons=buttons)
+
+@client.on(events.CallbackQuery())
+async def callback_handler(event):
+    data = event.data.decode('utf-8')
+    logging.info(f"Callback received: {data}")
+
+    if data == "start_bot":
+        await start_bot(event)
+    elif data == "stop_bot":
+        await stop_bot(event)
+    elif data == "reboot_bot":
+        await reboot_bot(event)
+    elif data == "download_db":
+        await download_db(event)
+    elif data == "delete_article":
+        await delete_article_prompt(event)
+
+async def start_bot(event):
+    logging.info("Starting the bot...")
+    await event.respond("Starting the bot...")
+
+    start_time = time.time()
+    process = subprocess.Popen(['python3', MAIN_BOT_SCRIPT])
+
+    while True:
+        time.sleep(1)
+        if process.poll() is not None:
+            break
+        if is_bot_running():
+            break
+
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+
+    await event.respond(f"Bot started.")
+    logging.info(f"Bot started.")
+
+def is_bot_running():
+    """Check if the bot is running by looking for specific log entries or process checks."""
+    # Need to add ogic to check if the bot has started properly. Check for log entry maybe.
+    return True  # Placeholder: Replace with actual check
+
+async def stop_bot(event):
+    logging.info("Stopping the bot...")
+    await event.respond("Stopping the bot...")
+    subprocess.run(['pkill', '-f', MAIN_BOT_SCRIPT])
+    await event.respond("Bot stopped.")
+
+async def reboot_bot(event):
+    logging.info("Rebooting the bot...")
+    await event.respond("Rebooting the bot...")
+
+    # Stop the bot
+    subprocess.run(['pkill', '-f', MAIN_BOT_SCRIPT])
+
+    # Start the bot
+    start_time = time.time()
+    process = subprocess.Popen(['python3', MAIN_BOT_SCRIPT])
+
+    while True:
+        time.sleep(1)
+        if process.poll() is not None:
+            break
+        if is_bot_running():
+            break
+
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+
+    stats["last_restart"] = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
+    await event.respond(f"Bot rebooted.")
+    logging.info(f"Bot rebooted.")
+
+async def download_db(event):
+    logging.info("Downloading the database...")
+    await event.respond("Downloading the database...")
+    
+    url = 'https://api.intercom.io/articles'
+    headers = {
+        'Authorization': f"Bearer {intercom_token}",
+        'Accept': 'application/json'
+    }
+    
+    response = requests.get(url, headers=headers)
+    if response.status_code == 200:
+        with open('info.json', 'w') as file:
+            json.dump(response.json(), file, indent=4)
+        
+        await event.respond("Database downloaded successfully.")
+        await client.send_file(event.chat_id, 'info.json', caption="Here is the downloaded database.")
+    else:
+        logging.error(f"Failed to download the database. Status code: {response.status_code}")
+        await event.respond("Failed to download the database.")
+
+async def delete_article_prompt(event):
+    sender_id = event.sender_id
+    article_deletion_state[sender_id] = {"step": "ask_id"}
+    await event.respond("Please enter the article ID to delete:")
+
+@client.on(events.NewMessage())
+async def handle_new_message(event):
+    sender_id = event.sender_id
+    if sender_id in article_deletion_state and article_deletion_state[sender_id]["step"] == "ask_id":
+        article_id = event.text.strip()
+        await delete_article(event, article_id)
+        del article_deletion_state[sender_id]
+
+async def delete_article(event, article_id):
+    url = f"https://api.intercom.io/articles/{article_id}"
+    headers = {
+        "Intercom-Version": "2.9",
+        "Authorization": f"Bearer {intercom_token}"
+    }
+
+    response = requests.delete(url, headers=headers)
+    if response.status_code == 200:
+        data = response.json()
+        if data.get('deleted'):
+            await event.respond(f"Article with ID {article_id} deleted successfully.")
+        else:
+            await event.respond(f"Failed to delete article with ID {article_id}.")
+    elif response.status_code == 404:
+        await event.respond(f"Article with ID {article_id} not found.")
+    else:
+        logging.error(f"Failed to delete article with ID {article_id}. Status code: {response.status_code}")
+        await event.respond(f"Failed to delete article with ID {article_id}. Status code: {response.status_code}")
+
+client.run_until_disconnected()
+
+----
+# main.py / this is the main script that runs the chatbot
+import asyncio
+import logging
+import time
+import os
+import subprocess
+import signal
+import sys
+import psutil
+from dotenv import load_dotenv
+from telethon import TelegramClient
+from data_processor import fetch_all_pages
+from vector_store import rebuild_vectorstore
+from telegram_bot import start_telegram_client, send_message
+from web_server import run_server
+
+# Load environment variables
+load_dotenv()
+api_id = os.getenv('API_ID')
+api_hash = os.getenv('API_HASH')
+bot_token = os.getenv('BOT_TOKEN')
+chat_id = int(os.getenv('CHAT_ID'))
+intercom_token = os.getenv('INTERCOM_TOKEN')
+
+json_file_path = 'info.json'
+prompt_template = os.getenv('PROMPT_TEMPLATE')
+embedding_log_file = 'logs/embeddings_log.txt'
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s', handlers=[
+    logging.FileHandler("logs/app.log"),
+    logging.StreamHandler()
+])
+
+start_time = time.time()
+client = None
+
+ollama_process = None
+ngrok_process = None
+tg_post_process = None
+
+def handle_signal(signal, frame):
+    asyncio.run(shutdown())
+
+async def shutdown():
+    global client, ollama_process, ngrok_process, tg_post_process
+    logging.info("Shutting down...")
+    if client:
+        await client.disconnect()
+        logging.info("Client disconnected.")
+
+    # Terminate processes
+    if ollama_process:
+        ollama_process.terminate()
+        await ollama_process.wait()
+        logging.info("ollama process terminated.")
+
+    if ngrok_process:
+        ngrok_process.terminate()
+        await ngrok_process.wait()
+        logging.info("ngrok process terminated.")
+
+    if tg_post_process:
+        tg_post_process.terminate()
+        await tg_post_process.wait()
+        logging.info("tg_post process terminated.")
+
+    # Kill processes bound to the port
+    port = 5001
+    for proc in psutil.process_iter():
+        for conn in proc.connections(kind='inet'):
+            if conn.laddr.port == port:
+                proc.terminate()
+
+    pending = asyncio.all_tasks()
+    for task in pending:
+        task.cancel()
+    await asyncio.gather(*pending, return_exceptions=True)
+    await asyncio.sleep(0.1)  # Give time for all tasks to complete
+
+    loop = asyncio.get_event_loop()
+    loop.stop()
+    loop.close()
+
+    sys.exit(0)
+
+
+async def start_subprocess(command):
+    process = await asyncio.create_subprocess_shell(
+        command,
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE
+    )
+    return process
+
+async def main():
+    global client, ollama_process, ngrok_process, tg_post_process
+    try:
+        logging.info("Starting ollama serve and ngrok tunnel")
+        # Start ollama serve and ngrok tunnel
+        ollama_process = await start_subprocess('ollama serve')
+        ngrok_process = await start_subprocess('ngrok http --domain=boom.ngrok.app 127.0.0.1:5001')
+
+        logging.info("Fetching data and rebuilding vector store")
+        await fetch_all_pages(intercom_token)  # Ensure data is fetched correctly
+        qa_chain = await rebuild_vectorstore(json_file_path, prompt_template, embedding_log_file)
+        
+        logging.info("Starting Telegram client")
+        client = await start_telegram_client(api_id, api_hash, bot_token, chat_id, qa_chain)
+        
+        logging.info("Running web server")
+        await run_server()
+    except Exception as e:
+        logging.error(f"Error in main: {str(e)}", exc_info=True)
+        await send_message(client, chat_id, '<span style="color:red">Shutting Down</span>')
+    finally:
+        await shutdown()
+
+if __name__ == '__main__':
+    signal.signal(signal.SIGINT, handle_signal)
+    signal.signal(signal.SIGTERM, handle_signal)
+    loop = asyncio.get_event_loop()
+    try:
+        loop.run_until_complete(main())
+    except Exception as e:
+        logging.error(f"Error: {str(e)}", exc_info=True)
+    finally:
+        pending = asyncio.all_tasks(loop)
+        for task in pending:
+            task.cancel()
+        group = asyncio.gather(*pending, return_exceptions=True)
+        loop.run_until_complete(group)
+        loop.run_until_complete(loop.shutdown_asyncgens())
+        loop.close()
+        logging.info("Script stopped.")
+
+
+----
+# data_processor.py
+import aiohttp
+import json
+import logging
+
+async def fetch_all_pages(intercom_token):
+    url = 'https://api.intercom.io/articles'
+    headers = {
+        'Authorization': f'Bearer {intercom_token}',
+        'Accept': 'application/json'
+    }
+    all_data = []
+
+    async with aiohttp.ClientSession() as session:
+        while url:
+            async with session.get(url, headers=headers) as response:
+                if response.status != 200:
+                    logging.error(f"Failed to fetch data: {response.status}")
+                    break
+                data = await response.json()
+                articles = data.get('data', [])
+                all_data.extend(articles)
+                url = data.get('pages', {}).get('next', None)
+
+    # Check to ensure all_data is a list of dictionaries
+    if not all(isinstance(item, dict) for item in all_data):
+        logging.error("Fetched data is not a list of dictionaries.")
+        return None
+
+    with open('info.json', 'w') as f:
+        json.dump(all_data, f, indent=2)
+
+    logging.info(f"Total records received: {len(all_data)}")
+    return 'info.json'
+----
+# telegram_bot.py
+from telethon import TelegramClient, events, Button
+from telethon.errors import RPCError, ChatAdminRequiredError, ChannelPrivateError
+from telethon.tl.types import PeerChannel
+import logging
+import time
+import subprocess
+import os
+
+qa_chain = None 
+
+async def start_telegram_client(api_id, api_hash, bot_token, chat_id, qa_chain_instance):
+    global qa_chain
+    qa_chain = qa_chain_instance
+
+    client = TelegramClient('logs/tg_chat', api_id, api_hash)
+
+    @client.on(events.NewMessage(pattern=r'^\.x (.+)', func=lambda e: e.text.lower().startswith('.x ')))
+    async def answer_query(event):
+        query = event.pattern_match.group(1)
+        logging.info(f"Received query: {query}")
+        result = await handle_query(query)
+        response = result["response"]
+        time_taken = result["time_taken"]
+        await event.respond(f"`{response}`\n**Time to generate: {time_taken:.2f} seconds**", parse_mode='Markdown')
+
+    @client.on(events.NewMessage(pattern='/rebuild'))
+    async def rebuild_vectorstore_command(event):
+        logging.info("Received /rebuild command. Rebuilding the vector store...")
+        await event.respond("Rebuilding database...")
+        await rebuild_vectorstore()
+        await event.respond("Database rebuilt.")
+
+    @client.on(events.NewMessage(pattern='/start'))
+    async def start_command(event):
+        buttons = [
+            [Button.inline("Start Bot", b"start_bot"), Button.inline("Stop Bot", b"stop_bot"), Button.inline("Reboot Bot", b"reboot_bot")],
+            [Button.inline("Write Article", b"write_article"), Button.inline("Rebuild DB", b"rebuild_db")],
+            [Button.inline("Download DB", b"download_db"), Button.inline("Delete Article", b"delete_article")]
+        ]
+        await event.respond("Choose an action:", buttons=buttons)
+
+    @client.on(events.CallbackQuery())
+    async def callback_handler(event):
+        data = event.data.decode('utf-8')
+
+        if data == "start_bot":
+            await start_bot(event)
+        elif data == "stop_bot":
+            await stop_bot(event)
+        elif data == "reboot_bot":
+            await reboot_bot(event)
+        elif data == "write_article":
+            await write_article(event)
+        elif data == "rebuild_db":
+            await rebuild_db(event)
+        elif data == "download_db":
+            await download_db(event)
+        elif data == "delete_article":
+            await delete_article(event)
+
+    async def start_bot(event):
+        await event.respond("Starting the bot...")
+        subprocess.Popen(['python3', 'main.py'])
+        await event.respond("Bot started.")
+
+    async def stop_bot(event):
+        await event.respond("Stopping the bot...")
+        subprocess.run(['pkill', '-f', 'main.py'])
+        await event.respond("Bot stopped.")
+
+    async def reboot_bot(event):
+        await event.respond("Rebooting the bot...")
+        subprocess.run(['pkill', '-f', 'main.py'])
+        subprocess.Popen(['python3', 'main.py'])
+        await event.respond("Bot rebooted.")
+
+    async def write_article(event):
+        await event.respond("Starting article creation...")
+        subprocess.Popen(['python3', 'tg_post.py'])
+        await event.respond("Article creation script started.")
+
+    async def rebuild_db(event):
+        await event.respond("Rebuilding the database...")
+        subprocess.Popen(['python3', 'rebuild_db_script.py'])
+        await event.respond("Database rebuild initiated.")
+
+    async def download_db(event):
+        await event.respond("Downloading the database...")
+        # Implement download logic here
+        await event.respond("Database downloaded.")
+
+    async def delete_article(event):
+        await event.respond("Deleting an article...")
+        # Implement delete article logic here
+        await event.respond("Article deletion initiated.")
+
+    await client.start(bot_token=bot_token)
+    logging.info("Telegram client connected.")
+
+    return client
+
+async def send_message(client, chat_id, message):
+    try:
+        entity = await client.get_entity(PeerChannel(chat_id))
+        await client.send_message(entity, message, parse_mode='html')
+    except ChatAdminRequiredError:
+        logging.error(f"Failed to send message to {chat_id}: Bot lacks admin rights.")
+    except ChannelPrivateError:
+        logging.error(f"Failed to send message to {chat_id}: Channel is private.")
+    except RPCError as e:
+        logging.error(f"Failed to send message to {chat_id}: {str(e)}")
+
+async def handle_query(query):
+    if qa_chain is None:
+        logging.error("QA chain is not initialized.")
+        return {"response": "Initialization error: Vector store not available. Check log for details.", "time_taken": 0}
+
+    start_time = time.time()
+    try:
+        result = qa_chain.invoke(query)
+    except Exception as e:
+        logging.error(f"Error during query handling: {str(e)}")
+        return {"response": "An error occurred while processing the query.", "time_taken": 0}
+
+    end_time = time.time()
+    time_taken = end_time - start_time
+
+    logging.info(f"Query result: {result}")
+
+    if isinstance(result, dict):
+        result = result.get('result', "No result field found in response.")
+    elif isinstance(result, str):
+        result = result.strip()
+    else:
+        result = str(result).strip()
+
+    if not result:
+        result = "I apologize, but I don't have enough information to provide a helpful answer."
+
+    return {"response": result, "time_taken": time_taken}
+---
+# utils.py
+def strip_html(content):
+    """Strips HTML tags from content using BeautifulSoup."""
+    from bs4 import BeautifulSoup
+    soup = BeautifulSoup(content, "html.parser")
+    return soup.get_text()
+---
+
+# vector_store.py
+import json
+import logging
+from bs4 import BeautifulSoup
+from langchain_community.vectorstores import Chroma
+from langchain_community.embeddings import GPT4AllEmbeddings
+from langchain.chains import RetrievalQA
+from langchain.docstore.document import Document
+from langchain_core.prompts import PromptTemplate
+from langchain_community.document_loaders import JSONLoader
+from langchain_community.llms import Ollama
+from langchain.callbacks.manager import CallbackManager
+from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
+from langchain_community.vectorstores.utils import filter_complex_metadata
+
+def metadata_func(record: dict, metadata: dict) -> dict:
+    metadata["title"] = record.get("title")
+    metadata["author_id"] = record.get("author_id")
+    metadata["created_at"] = record.get("created_at")
+    metadata["id"] = record.get("id")
+    return metadata
+
+def strip_html(content):
+    """Strips HTML tags from content using BeautifulSoup."""
+    soup = BeautifulSoup(content, "html.parser")
+    return soup.get_text()
+
+def clean_metadata(metadata):
+    """Ensure metadata values are strings, ints, floats, or bools."""
+    cleaned_metadata = {}
+    for k, v in metadata.items():
+        if isinstance(v, (str, int, float, bool)):
+            cleaned_metadata[k] = v
+        elif isinstance(v, list):
+            cleaned_metadata[k] = ', '.join(map(str, v))  # Convert list to a comma-separated string
+        elif v is None:
+            cleaned_metadata[k] = ''  # Replace None with empty string
+        else:
+            cleaned_metadata[k] = str(v)  # Convert other types to string
+    return cleaned_metadata
+
+class CustomGPT4AllEmbeddings(GPT4AllEmbeddings):
+    def __call__(self, input):
+        return self.embed_documents(input)
+
+llm = Ollama(model="trojan-chat-bot", callback_manager=CallbackManager([StreamingStdOutCallbackHandler()]))
+
+async def rebuild_vectorstore(json_file_path, prompt_template, embedding_log_file):
+    QA_CHAIN_PROMPT = PromptTemplate(
+        input_variables=["context", "question"],
+        template=prompt_template,
+    )
+
+    try:
+        with open(json_file_path, 'r') as f:
+            data = json.load(f)
+
+        # Ensure the data is a list of dictionaries
+        if not isinstance(data, list) or not all(isinstance(item, dict) for item in data):
+            raise ValueError(f"Expected a list of dictionaries, but got {type(data)} with content {data}")
+
+        valid_documents = []
+        invalid_documents = []
+        for d in data:
+            if d.get("body") and d["body"].strip():
+                stripped_content = strip_html(d["body"])
+                if stripped_content.strip():
+                    page_content_with_id = f"ID: {d.get('id')}\n{stripped_content}"
+                    metadata = clean_metadata(d)
+                    valid_documents.append(Document(page_content=page_content_with_id, metadata=metadata))
+                else:
+                    invalid_documents.append(d)
+            else:
+                invalid_documents.append(d)
+
+        logging.info(f"Total valid documents: {len(valid_documents)}")
+        logging.info(f"Total invalid documents: {len(invalid_documents)}")
+        for invalid in invalid_documents:
+            logging.warning(f"Invalid document: {invalid}")
+
+        if valid_documents:
+            embedder = CustomGPT4AllEmbeddings(model="all-MiniLM-L6-v2.gguf")
+            logging.info("Generating embeddings for documents...")
+            embeddings = embedder.embed_documents([doc.page_content for doc in valid_documents])
+
+            with open(embedding_log_file, 'w') as f:
+                for doc, embedding in zip(valid_documents, embeddings):
+                    f.write(f"Document ID: {doc.metadata['id']}\n")
+                    f.write(f"Document Content: {doc.page_content}\n")
+                    f.write(f"Embedding: {embedding}\n\n")
+
+            logging.info(f"Total embeddings generated: {len(embeddings)}")
+            vectorstore = Chroma.from_documents(documents=valid_documents, embedding=embedder)
+            logging.info("Vector store successfully rebuilt.")
+
+            retriever = vectorstore.as_retriever(search_type="similarity", k=5)
+            qa_chain = RetrievalQA.from_chain_type(
+                llm=llm,
+                chain_type="stuff",
+                retriever=retriever,
+                chain_type_kwargs={"prompt": QA_CHAIN_PROMPT, "document_variable_name": "context"}
+            )
+            logging.info("QA chain initialized successfully.")
+        else:
+            logging.error("No valid documents with non-empty body found.")
+    except Exception as e:
+        logging.error(f"Error rebuilding vector store: {str(e)}", exc_info=True)
+        raise
+
+    return qa_chain
+---
+
+# web_server.py
+from quart import Quart, jsonify, request
+from hypercorn.config import Config
+from hypercorn.asyncio import serve
+import logging
+
+app = Quart(__name__)
+
+@app.route('/intercom', methods=['POST'])
+async def intercom_handler():
+    data = await request.get_json()
+    query = data.get("body")
+    if query:
+        result = await handle_query(query)
+        response = result["response"]
+        time_taken = result["time_taken"]
+        return jsonify({"response": response, "time_taken": time_taken}), 200
+    else:
+        logging.error("No query provided in the request")
+        return jsonify({"error": "No query provided"}), 400
+
+@app.route('/rebuild_vectorstore', methods=['POST'])
+async def rebuild_vectorstore_handler():
+    await rebuild_vectorstore()
+    return jsonify({"message": "Vector store rebuilt"}), 200
+
+async def run_server():
+    config = Config()
+    config.bind = ["0.0.0.0:5001"]
+    await serve(app, config)
+

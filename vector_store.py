@@ -1,6 +1,7 @@
-# vector_store.py
 import json
 import logging
+import os  # Ensure this import is present
+import time  # Add this import statement
 from bs4 import BeautifulSoup
 from langchain_community.vectorstores import Chroma
 from langchain_community.embeddings import GPT4AllEmbeddings
@@ -54,6 +55,33 @@ async def rebuild_vectorstore(json_file_path, prompt_template, embedding_log_fil
     try:
         with open(json_file_path, 'r') as f:
             data = json.load(f)
+
+        logging.info(f"Total records received from remote: {len(data)}")
+
+        # Load supplemental info if available
+        supplemental_file_path = 'supplemental_info.json'
+        if os.path.exists(supplemental_file_path) and os.path.getsize(supplemental_file_path) > 0:
+            with open(supplemental_file_path, 'r') as f:
+                supplemental_data = json.load(f)
+                logging.info(f"Total records received from supplemental: {len(supplemental_data)}")
+                # Convert supplemental data to the format expected by the vector store
+                for item in supplemental_data:
+                    data.append({
+                        "id": f"supplemental_{int(time.time())}",
+                        "type": "article",
+                        "workspace_id": "supplemental",
+                        "parent_id": None,
+                        "parent_type": None,
+                        "parent_ids": [],
+                        "title": item["question"],
+                        "description": item["question"],
+                        "body": item["answer"],
+                        "author_id": None,
+                        "state": "published",
+                        "created_at": int(time.time()),
+                        "updated_at": int(time.time()),
+                        "url": None
+                    })
 
         # Ensure the data is a list of dictionaries
         if not isinstance(data, list) or not all(isinstance(item, dict) for item in data):
