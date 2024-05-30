@@ -1,4 +1,4 @@
-# Llama3 RAG enabled chatbot
+# Llama3 RAG Enabled Chatbot
 
 ## Overview
 
