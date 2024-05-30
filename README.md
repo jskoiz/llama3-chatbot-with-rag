@@ -1,4 +1,4 @@
-# Intercom AI Chat Bot
+# Llama3 RAG enabled chatbot
 
 ## Overview
 
