@@ -1,4 +1,4 @@
-# main.py 
+# main.py
 import asyncio
 import logging
 import time
@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 from telethon import TelegramClient
 from data_processor import fetch_all_pages
 from vector_store import rebuild_vectorstore
-from telegram_bot import start_telegram_client, send_message
+from telegram_bot import start_telegram_client
 from web_server import run_server
 
 # Load environment variables
@@ -83,7 +83,6 @@ async def shutdown():
 
     sys.exit(0)
 
-
 async def start_subprocess(command):
     process = await asyncio.create_subprocess_shell(
         command,
@@ -105,13 +104,12 @@ async def main():
         qa_chain = await rebuild_vectorstore(json_file_path, prompt_template, embedding_log_file)
         
         logging.info("Starting Telegram client")
-        client = await start_telegram_client(api_id, api_hash, bot_token, chat_id, qa_chain)
+        client = await start_telegram_client(api_id, api_hash, bot_token, qa_chain)
         
         logging.info("Running web server")
         await run_server()
     except Exception as e:
         logging.error(f"Error in main: {str(e)}", exc_info=True)
-        await send_message(client, chat_id, '<span style="color:red">Shutting Down</span>')
     finally:
         await shutdown()
 
@@ -132,4 +130,3 @@ if __name__ == '__main__':
         loop.run_until_complete(loop.shutdown_asyncgens())
         loop.close()
         logging.info("Script stopped.")
-
