@@ -51,12 +51,12 @@ jobs:
         else
           echo "Llama3 model already pulled"
         fi
-    - name: Create Trojan model if not already created
+    - name: Create custom model if not already created
       run: |
-        if ! ollama list | grep -q "trojan-chat-bot"; then
-          ollama create trojan-chat-bot -f trojan-bot
+        if ! ollama list | grep -q "custom-chat-bot"; then
+          ollama create custom-chat-bot -f custom-bot
         else
-          echo "Trojan model already created"
+          echo "custom model already created"
         fi
     - name: Install Ngrok if not already installed
       run: |

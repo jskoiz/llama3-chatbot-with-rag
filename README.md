@@ -28,8 +28,8 @@ The bot uses a vector store to provide relevant answers based on the data fetche
 1. Clone the repository:
 
     ```bash
-    git clone https://github.com/your-username/trojan-intercom-bot.git
-    cd trojan-intercom-bot
+    git clone https://github.com/your-username/custom-intercom-bot.git
+    cd custom-intercom-bot
     ```
 
 2. Create and activate a virtual environment:
@@ -60,7 +60,7 @@ The bot uses a vector store to provide relevant answers based on the data fetche
 
     ```bash
     ollama pull llama3
-    ollama create trojan-chat-bot -f trojan-bot
+    ollama create custom-chat-bot -f custom-bot
     ```
 
 ## Usage

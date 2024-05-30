@@ -68,7 +68,7 @@ QA_CHAIN_PROMPT = PromptTemplate(
     template=template,
 )
 
-llm = Ollama(model="trojan-chat-bot", callback_manager=CallbackManager([StreamingStdOutCallbackHandler()]))
+llm = Ollama(model="custom-chat-bot", callback_manager=CallbackManager([StreamingStdOutCallbackHandler()]))
 
 qa_chain = None
 if vectorstore:

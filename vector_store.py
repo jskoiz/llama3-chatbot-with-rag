@@ -1,3 +1,4 @@
+# vector_store.py
 import json
 import logging
 import os  # Ensure this import is present
@@ -44,7 +45,7 @@ class CustomGPT4AllEmbeddings(GPT4AllEmbeddings):
     def __call__(self, input):
         return self.embed_documents(input)
 
-llm = Ollama(model="trojan-chat-bot", callback_manager=CallbackManager([StreamingStdOutCallbackHandler()]))
+llm = Ollama(model="custom-chat-bot", callback_manager=CallbackManager([StreamingStdOutCallbackHandler()]))
 
 async def rebuild_vectorstore(json_file_path, prompt_template, embedding_log_file):
     QA_CHAIN_PROMPT = PromptTemplate(

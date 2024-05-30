@@ -53,7 +53,7 @@ QA_CHAIN_PROMPT = PromptTemplate(
     template=qa_chain_prompt_template,
 )
 
-llm = Ollama(model="trojan-chat-bot", callback_manager=CallbackManager([StreamingStdOutCallbackHandler()]))
+llm = Ollama(model="custom-chat-bot", callback_manager=CallbackManager([StreamingStdOutCallbackHandler()]))
 
 async def fetch_all_pages():
     url = 'https://api.intercom.io/articles'
